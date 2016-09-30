@@ -15,4 +15,8 @@ router.get('/start', function(req, res, next){
     });
 });
 
+router.get('/health', function(req, res){
+   res.send("alive");
+});
+
 module.exports = router;
