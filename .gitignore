@@ -39,3 +39,6 @@ jspm_packages
 #app
 config/
 !config/default.json
+
+#ide
+.idea
