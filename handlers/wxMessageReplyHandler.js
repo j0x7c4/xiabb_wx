@@ -1,23 +1,23 @@
 var logger = require('../logger/logger').logger(__filename);
 
 WxMessageReplyHandler = function(data, callback) {
-    if (!data) {
-        callback(new Error("no query found"));
+    if (!data || !data.xml) {
+        callback(new Error("no data found"));
+    } else if (data.xml.msgtype != "text") {
+        callback(new Error("wrong msgType"));
     } else {
-        var signature = data.signature;
-        var timestamp = data.timestamp;
-        var nonce = data.nonce;
-        var echostr = data.echostr;
-        var token = config['token'];
-        var code = [token, timestamp, nonce]
-        var text = code.sort().join("");
-        const hash = crypto.createHash("sha1").update(text).digest('hex');
-        logger.info("handle/GET func: hash, signature: ", hash, signature);
-        if (hash == signature) {
-            callback(null, echostr);
-        } else {
-            callback(null, hash);
-        }
+        var xml = data.xml;
+        var toUser = xml.fromusername;
+        var fromUser = xml.tousername;
+        var content = "test";
+        var response = {
+            ToUserName: toUser,
+            FromUserName: fromUser,
+            CreateTime:  parseInt((new Date().getTime())/1000, 10),
+            MsgType: 'text',
+            Content: content
+        };
+        callback(null, response);
     }
 };
 

@@ -7,11 +7,11 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/start', function(req, res, next){
-    wxStartHandler(req.query, function(err, data) {
+    wxStartHandler(req.query, function(err, response) {
         if (err) {
             next(err);
         }
-        res.send(data);
+        res.send(response);
     });
 });
 
