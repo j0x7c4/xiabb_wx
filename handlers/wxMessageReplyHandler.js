@@ -9,7 +9,7 @@ WxMessageReplyHandler = function(data, callback) {
         var xml = data.xml;
         var toUser = xml.fromusername;
         var fromUser = xml.tousername;
-        var content = "test";
+        var content = xml.content;
         var response = {
             ToUserName: toUser,
             FromUserName: fromUser,
