@@ -4,7 +4,7 @@ var config = require('config');
 
 function Basic() {
     this.accessToken = '';
-    this.leftTime = 0
+    this.expireTime = 0
 }
 
 Basic.prototype.realGetAccessToken = function (callback) {
@@ -15,19 +15,89 @@ Basic.prototype.realGetAccessToken = function (callback) {
             callback(err);
         } else {
             that.accessToken = data['access_token'];
-            that.leftTime = data['expires_in'];
+            that.expireTime = data['expires_in'] + parseInt((new Date().getTime())/1000);
             callback(null, that.accessToken);
         }
     });
 };
 
 Basic.prototype.getAccessToken = function(callback) {
-    if (this.leftTime<10) {
+    if (parseInt((new Date().getTime())/1000)+10>=this.expireTime) {
         this.realGetAccessToken(callback);
     } else {
         callback(null, this.accessToken);
     }
+};
+
+Basic.prototype.createMenu = function(callback) {
+    this.getAccessToken(function(err, accessToken) {
+        if (err) {
+            callback(err);
+        } else {
+            var path = '/cgi-bin/menu/create?access_token=' + accessToken;
+            var reqData = config.menu;
+            post(reqData, path, function(err, resData) {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(null, resData);
+                }
+            });
+        }
+    })
+};
+
+Basic.prototype.queryMenu = function(callback) {
+    this.getAccessToken(function(err, accessToken) {
+        if (err) {
+            callback(err);
+        } else {
+            var path = '/cgi-bin/menu/get?access_token=' + accessToken;
+            get(path, function(err, resData) {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(null, resData);
+                }
+            });
+        }
+    });
 }
+
+Basic.prototype.getCurrentSelfMenuInfo = function(callback) {
+    this.getAccessToken(function(err, accessToken) {
+        if (err) {
+            callback(err);
+        } else {
+            var path = '/cgi-bin/get_current_selfmenu_info?access_token=' + accessToken;
+            get(path, function(err, resData) {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(null, resData);
+                }
+            });
+        }
+    });
+};
+
+Basic.prototype.deleteMenu = function(callback) {
+    this.getAccessToken(function(err, accessToken) {
+        if (err) {
+            callback(err);
+        } else {
+            var path = '/cgi-bin/menu/delete?access_token=' + accessToken;
+            get(path, function(err, resData) {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(null, resData);
+                }
+            });
+        }
+    });
+};
+
 module.exports = {
     Basic: Basic
 };
