@@ -18,11 +18,12 @@ router.post('/', xmlparser({trim: true, explicitArray: false}), function(req, re
     wxEngineHandler(req.body, function(err, response) {
         if (err) {
             next(err);
+        } else {
+            res.set('Content-Type', 'text/xml');
+            //response['?xml version="1.0" encoding="utf-8"?'] = null;
+            var xml_response = "<xml>" + o2x(response) + "</xml>";
+            res.send(xml_response);
         }
-        res.set('Content-Type', 'text/xml');
-        //response['?xml version="1.0" encoding="utf-8"?'] = null;
-        var xml_response = "<xml>"+o2x(response)+"</xml>";
-        res.send(xml_response);
     });
 });
 

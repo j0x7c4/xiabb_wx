@@ -19,7 +19,6 @@ WxEngineHandler = function(data, callback) {
         if (eventType == "Location") {
 
         }
-
     }
 };
 

@@ -1,7 +1,6 @@
 var https = require('https');
 var config = require('config');
 var logger = require('../logger/logger').logger(__filename);
-
 var parseRsp = function(rsp, callback) {
     var body = '';
     rsp.setEncoding('utf8');
@@ -33,7 +32,8 @@ var _post = function(data,path,next) {
         method: 'POST',
         agent: false,
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            'Content-Length': Buffer.byteLength(data)
         }
     };
 

@@ -9,7 +9,6 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var menuRoutes = require('./routes/menu');
-var Basic = require('./handlers/wxApiHandler').Basic;
 var app = express();
 
 // view engine setup
@@ -24,13 +23,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-//set wxApi middleware
-app.use(function(req, res, next){
-    var basicApi = new Basic();
-    req.basicApi = basicApi;
-    next();
-});
 
 app.use('/', routes);
 app.use('/menu', menuRoutes);

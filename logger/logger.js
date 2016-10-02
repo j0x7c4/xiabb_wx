@@ -7,6 +7,12 @@ log4js.configure({
         },
         {
             type: 'file',
+            filename: 'logs/query.log',
+            maxLogSize: 10240,
+            category: 'query'
+        },
+        {
+            type: 'file',
             filename: 'logs/access.log',
             maxLogSize: 1024,
             backups:3,

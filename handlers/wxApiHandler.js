@@ -13,6 +13,8 @@ Basic.prototype.realGetAccessToken = function (callback) {
     get(path, function(err, data) {
         if (err) {
             callback(err);
+        } else if (data.errcode) {
+            callback(new Error(data.errmsg));
         } else {
             that.accessToken = data['access_token'];
             that.expireTime = data['expires_in'] + parseInt((new Date().getTime())/1000, 10);
@@ -39,6 +41,8 @@ Basic.prototype.createMenu = function(callback) {
             post(reqData, path, function(err, resData) {
                 if (err) {
                     callback(err);
+                } else if (resData.errcode) {
+                    callback(new Error(resData.errmsg));
                 } else {
                     callback(null, resData);
                 }
@@ -56,6 +60,8 @@ Basic.prototype.queryMenu = function(callback) {
             get(path, function(err, resData) {
                 if (err) {
                     callback(err);
+                } else if (resData.errcode) {
+                    callback(new Error(resData.errmsg));
                 } else {
                     callback(null, resData);
                 }
@@ -73,6 +79,8 @@ Basic.prototype.getCurrentSelfMenuInfo = function(callback) {
             get(path, function(err, resData) {
                 if (err) {
                     callback(err);
+                } else if (resData.errcode) {
+                    callback(new Error(resData.errmsg));
                 } else {
                     callback(null, resData);
                 }
@@ -90,6 +98,8 @@ Basic.prototype.deleteMenu = function(callback) {
             get(path, function(err, resData) {
                 if (err) {
                     callback(err);
+                } else if (resData.errcode) {
+                    callback(new Error(resData.errmsg));
                 } else {
                     callback(null, resData);
                 }
@@ -98,6 +108,23 @@ Basic.prototype.deleteMenu = function(callback) {
     });
 };
 
-module.exports = {
-    Basic: Basic
-};
+Basic.prototype.batchGetMaterial = function(data, callback) {
+    this.getAccessToken(function(err, accessToken) {
+        if (err) {
+            callback(err);
+        } else {
+            var path = '/cgi-bin/material/batchget_material?access_token=' + accessToken;
+            post(data, path, function(err, resData) {
+                if (err) {
+                    callback(err);
+                } else if (resData.errcode) {
+                    callback(new Error(resData.errmsg));
+                } else {
+                    callback(resData);
+                }
+            });
+        }
+    });
+}
+
+module.exports = new Basic();
