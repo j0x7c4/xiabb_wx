@@ -15,10 +15,12 @@ WxEngineHandler = function(data, callback) {
         });
     } else if (data.xml.msgtype == "event") {
         var xml = data.xml;
-        var eventType = xml.eventtype;
+        var eventType = xml.event;
+        if (eventType == "Location") {
+
+        }
+
     }
 };
 
-module.exports = {
-    WxEngineHandler: WxEngineHandler
-};
+module.exports = WxEngineHandler;

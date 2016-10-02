@@ -15,14 +15,14 @@ Basic.prototype.realGetAccessToken = function (callback) {
             callback(err);
         } else {
             that.accessToken = data['access_token'];
-            that.expireTime = data['expires_in'] + parseInt((new Date().getTime())/1000);
+            that.expireTime = data['expires_in'] + parseInt((new Date().getTime())/1000, 10);
             callback(null, that.accessToken);
         }
     });
 };
 
 Basic.prototype.getAccessToken = function(callback) {
-    if (parseInt((new Date().getTime())/1000)+10>=this.expireTime) {
+    if (parseInt((new Date().getTime())/1000, 10)+10>=this.expireTime) {
         this.realGetAccessToken(callback);
     } else {
         callback(null, this.accessToken);
