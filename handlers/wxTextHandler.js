@@ -6,14 +6,14 @@ WxTextHandler = function (reqData, callback) {
         if (err) {
             callback(err);
         } else if (resData ) {
-            logger.info({req:reqData, res:resData});
+            logger.info(JSON.stringify({req:reqData, res:resData}));
             callback(null, resData);
         } else {
             wxMessageManager.makeText(reqData, function(err, resData){
                 if (err) {
                     callback(err);
                 } else {
-                    logger.info({req:reqData, res:resData});
+                    logger.info(JSON.stringify({req:reqData, res:resData}));
                     callback(null, resData);
                 }
             });
