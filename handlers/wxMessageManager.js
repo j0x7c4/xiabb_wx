@@ -1,6 +1,7 @@
 var logger = require('../logger/logger').logger(__filename);
 
 var basicApi = require('./wxApiHandler');
+var wpService = require('./wpService');
 
 var makeWxNews = function (context, callback) {
     basicApi.batchGetMaterial({type:"news", offset:0, count:3}, function(err, resData) {
@@ -67,35 +68,39 @@ var makeText = function (context, callback) {
 };
 
 var makeNews = function(context, callback) {
-    try {
-        var toUser = context.fromusername;
-        var fromUser = context.tousername;
-        var content = context.content;
-        var response = {
-            ToUserName: toUser,
-            FromUserName: fromUser,
-            CreateTime: parseInt((new Date().getTime()) / 1000, 10),
-            MsgType: 'news',
-            ArticleCount: 2,
-            Articles: {
-                item: [
-                    {
-                        Title: content,
-                        Description: 'description1',
-                        Url:'http://blog.xiabb.me/2016/04/14/kie-workbench-and-kie-server/'
-                    },
-                    {
-                        Title: 'title2',
-                        Description: 'description2',
-                        Url:'http://blog.xiabb.me/2016/04/14/kie-workbench-and-kie-server/'
+    wpService.getPostsDetail([], function(err, rows) {
+        if (err) {
+            callback(err);
+        } else {
+            try {
+                var toUser = context.fromusername;
+                var fromUser = context.tousername;
+                var posts = [];
+                for (var i=0 ; i<rows.length; i++) {
+                    var post = rows[i];
+                    posts.add({
+                        Title: post['post_title'],
+                        Description: post['display_name'],
+                        Url: post['url']
+                    });
+                }
+                var response = {
+                    ToUserName: toUser,
+                    FromUserName: fromUser,
+                    CreateTime: parseInt((new Date().getTime()) / 1000, 10),
+                    MsgType: 'news',
+                    ArticleCount: posts.length,
+                    Articles: {
+                        item: posts
                     }
-                ]
+                };
+                callback(null, response);
+            } catch (err) {
+                callback(err);
             }
-        };
-        callback(null, response);
-    } catch (err) {
-        callback(err);
-    }
+        }
+    });
+
 }
 
 module.exports = {

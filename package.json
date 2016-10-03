@@ -13,8 +13,10 @@
     "express": "~4.12.4",
     "express-xml-bodyparser": "^0.3.0",
     "jade": "~1.9.2",
+    "knex": "^0.12.2",
     "log4js": "^0.6.38",
     "morgan": "~1.5.3",
+    "mysql": "^2.11.1",
     "object-to-xml": "^1.1.0",
     "serve-favicon": "~2.2.1"
   }
