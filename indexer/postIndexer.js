@@ -4,6 +4,8 @@ var config = require('config').es;
 
 function PostIndexer () {
     this.BULK_SIZE = config.bulkSize;
+    this.lastIndexName = '';
+    this.lastUpdateTime = new Date();
     this.mappings = require('./mappings/post');
     this.client = new elasticsearch.Client({
         host: config.host+":"+config.port,
@@ -22,7 +24,8 @@ PostIndexer.prototype.createAllIndex = function(callback) {
             callback(err);
         } else {
             try {
-                var indexName = config.index + "_" + parseInt((new Date()).getTime()/1000,10);
+                var updateTime = new Date();
+                var indexName = config.index + "_" + parseInt(updateTime.getTime()/1000,10);
                 that.client.indices.create({index: indexName}, function (err, data, status) {
                     if (err) {
                         callback(err);
@@ -50,7 +53,7 @@ PostIndexer.prototype.createAllIndex = function(callback) {
                                         callback(err);
                                     } else {
                                         that.client.indices.deleteAlias({
-                                            index: config.index + "_*",
+                                            index: that.lastIndexName,
                                             name: config.index
                                         }, function(err, data, status) {
                                             that.client.indices.putAlias({
@@ -60,6 +63,8 @@ PostIndexer.prototype.createAllIndex = function(callback) {
                                                 if (err) {
                                                     callback(err);
                                                 } else {
+                                                    that.lastIndexName = indexName;
+                                                    that.lastUpdateTime = updateTime;
                                                     callback(status);
                                                 }
                                             });
