@@ -1,4 +1,3 @@
-var https = require('https');
 var config = require('config');
 var logger = require('../logger/logger').logger(__filename);
 var parseRsp = function(rsp, callback) {
@@ -24,10 +23,10 @@ var parseRsp = function(rsp, callback) {
         callback(e);
     });
 }
-var _post = function(data,path,next) {
+var _post = function(host, port, path, data,next) {
     var options = {
-        hostname: config.wxApiHost,
-        port: config.wxApiPort,
+        hostname: host,
+        port: port,
         path: path,
         method: 'POST',
         agent: false,
@@ -36,9 +35,12 @@ var _post = function(data,path,next) {
             'Content-Length': Buffer.byteLength(data)
         }
     };
-
     // Set up the request
-    var postReq = https.request(options, function(rsp){
+    var protocal = require('http');
+    if (port==443) {
+        protocal = require('https');
+    }
+    var postReq = protocal.request(options, function(rsp){
         parseRsp(rsp, next);
     }).on('error', function(e) {
         logger.error(options.path,e.stack || e);
@@ -48,10 +50,10 @@ var _post = function(data,path,next) {
     postReq.end();
 };
 
-var _get = function(path, next) {
+var _get = function(host, port, path, next) {
     var options = {
-        hostname: config.wxApiHost,
-        port: config.wxApiPort,
+        hostname: host,
+        port: port,
         path: path,
         method: 'GET',
         headers: {
@@ -59,7 +61,11 @@ var _get = function(path, next) {
         },
         agent: false
     };
-    var req = https.request(options, function(rsp){
+    var protocal = require('http');
+    if (port==443) {
+        protocal = require('https');
+    }
+    var req = protocal.request(options, function(rsp){
             parseRsp(rsp, next);
         })
         .on('error', function(e) {

@@ -4,6 +4,7 @@ var wxStartHandler = require('../handlers/wxStartHandler.js');
 var wxEngineHandler = require('../handlers/wxEngineHandler.js');
 var xmlparser = require('express-xml-bodyparser');
 var o2x = require('object-to-xml');
+var postIndexer = require('../indexer/postIndexer');
 
 router.get('/', function(req, res, next){
     wxStartHandler(req.query, function(err, response) {
@@ -28,7 +29,17 @@ router.post('/', xmlparser({trim: true, explicitArray: false}), function(req, re
 });
 
 router.get('/health', function(req, res){
-   res.send("alive");
+    res.send("alive");
+});
+
+router.get('/indexer/post', function(req, res, next) {
+    postIndexer.createAllIndex(function(err, data) {
+        if (err) {
+            next(err);
+        } else {
+            res.send(data);
+        }
+    });
 });
 
 module.exports = router;

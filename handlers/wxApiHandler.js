@@ -10,7 +10,7 @@ function Basic() {
 Basic.prototype.realGetAccessToken = function (callback) {
     var path = '/cgi-bin/token?grant_type=client_credential&appid='+config.appId+'&secret='+config.appSecret;
     var that = this;
-    get(path, function(err, data) {
+    get(config.wxApiHost, config.wxApiPort, path, function(err, data) {
         if (err) {
             callback(err);
         } else if (data.errcode) {
@@ -38,7 +38,7 @@ Basic.prototype.createMenu = function(callback) {
         } else {
             var path = '/cgi-bin/menu/create?access_token=' + accessToken;
             var reqData = config.menu;
-            post(reqData, path, function(err, resData) {
+            post(config.wxApiHost, config.wxApiPort, path, reqData, function(err, resData) {
                 if (err) {
                     callback(err);
                 } else if (resData.errcode) {
@@ -57,7 +57,7 @@ Basic.prototype.queryMenu = function(callback) {
             callback(err);
         } else {
             var path = '/cgi-bin/menu/get?access_token=' + accessToken;
-            get(path, function(err, resData) {
+            get(config.wxApiHost, config.wxApiPort, path, function(err, resData) {
                 if (err) {
                     callback(err);
                 } else if (resData.errcode) {
@@ -76,7 +76,7 @@ Basic.prototype.getCurrentSelfMenuInfo = function(callback) {
             callback(err);
         } else {
             var path = '/cgi-bin/get_current_selfmenu_info?access_token=' + accessToken;
-            get(path, function(err, resData) {
+            get(config.wxApiHost, config.wxApiPort, path, function(err, resData) {
                 if (err) {
                     callback(err);
                 } else if (resData.errcode) {
@@ -95,7 +95,7 @@ Basic.prototype.deleteMenu = function(callback) {
             callback(err);
         } else {
             var path = '/cgi-bin/menu/delete?access_token=' + accessToken;
-            get(path, function(err, resData) {
+            get(config.wxApiHost, config.wxApiPort, path, function(err, resData) {
                 if (err) {
                     callback(err);
                 } else if (resData.errcode) {
@@ -114,7 +114,7 @@ Basic.prototype.batchGetMaterial = function(data, callback) {
             callback(err);
         } else {
             var path = '/cgi-bin/material/batchget_material?access_token=' + accessToken;
-            post(data, path, function(err, resData) {
+            post(config.wxApiHost, config.wxApiPort, path, data, function(err, resData) {
                 if (err) {
                     callback(err);
                 } else if (resData.errcode) {
