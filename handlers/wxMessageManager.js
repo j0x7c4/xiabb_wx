@@ -78,7 +78,7 @@ var makeNews = function(context, callback) {
                 var posts = [];
                 for (var i=0 ; i<rows.length; i++) {
                     var post = rows[i];
-                    posts.add({
+                    posts.push({
                         Title: post['post_title'],
                         Description: post['display_name'],
                         Url: post['url']
