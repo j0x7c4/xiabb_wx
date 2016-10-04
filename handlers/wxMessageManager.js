@@ -90,10 +90,25 @@ var makeNews = function(context, callback) {
         var toUser = context.fromusername;
         var fromUser = context.tousername;
 
+        var errResponse = {
+            ToUserName: toUser,
+            FromUserName: fromUser,
+            CreateTime: parseInt((new Date().getTime()) / 1000, 10),
+            MsgType: 'news',
+            ArticleCount: 1,
+            Articles: {
+                item: {
+                    Title:'"'+context.content+'"的搜索结果',
+                    Description: '哎呀,瞎BB队长开小差去了!'
+                }
+            }
+        };
+
         if (postIds.length > 0) {
             wpService.getPostsDetail(postIds, function(err, rows) {
                 if (err) {
-                    callback(err);
+                    logger.error(err);
+                    callback(null, errResponse);
                 } else {
                     try {
                         var posts = [{
@@ -120,7 +135,7 @@ var makeNews = function(context, callback) {
                         };
                         callback(null, response);
                     } catch (err) {
-                        callback(err);
+                        callback(null, errResponse);
                     }
                 }
             });
@@ -129,14 +144,6 @@ var makeNews = function(context, callback) {
                 Title:'"'+context.content+'"的搜索结果',
                 Description: '啊,没有搜索到文章!'
             }];
-            //for (var i=0 ; i<rows.length; i++) {
-            //    var post = rows[i];
-            //    posts.push({
-            //        Title: post['post_title'],
-            //        Description: post['display_name'],
-            //        Url: post['url']
-            //    });
-            //}
             var response = {
                 ToUserName: toUser,
                 FromUserName: fromUser,
