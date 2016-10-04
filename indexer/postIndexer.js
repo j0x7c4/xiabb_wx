@@ -57,7 +57,7 @@ PostIndexer.prototype.createAllIndex = function(callback) {
                                         callback(err);
                                     } else {
                                         that.client.indices.deleteAlias({
-                                            index: that.lastIndexName,
+                                            index: config.index+"_*",
                                             name: config.index
                                         }, function(err, data, status) {
                                             that.client.indices.putAlias({
