@@ -1,5 +1,5 @@
 # introduction
-A backend service for wechat, including searching, recommendation and multi-staff matching
+A backend service for wechat, including searching, recommendation and multi-stuff matching
 
 # environment
 + node v4.0+
