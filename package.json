@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "mkdir logs; node ./bin/www"
+    "deploy": "mkdir logs; npm install",
+    "start": "pm2 start bin/www -n xiabb_wx",
+    "restart": "pm2 restart xiabb_wx",
+    "stop": "pm2 delete xiabb_wx"
   },
   "dependencies": {
     "body-parser": "~1.12.4",

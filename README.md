@@ -1,3 +1,19 @@
+# introduction
+A backend service for wechat, including searching, recommendation and multi-staff matching
+
+# environment
++ node v4.0+
++ npm
++ pm2
++ wordpress
++ elasticsearch
++ mysql
++ nginx
+
+# setup
++ npm run deploy
++ npm run start/restart/stop
+
 # Config
 add following config to config/default.json
 
