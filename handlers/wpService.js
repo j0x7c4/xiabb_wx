@@ -17,7 +17,7 @@ function WpService() {
 WpService.prototype.getIncIndexPosts = function(last_update_time, callback) {
     var sql = "SELECT po.ID AS post_id, "+
         "max(post_title) as post_title, "+
-        "max(post_content) as post_content, "+
+        "CONCAT_WS(',', max(post_title), max(post_content)) AS post_content, "+
         "DATE_FORMAT(max(post_date),'%Y-%m-%d %T') as post_time, "+
         "max(usr.display_name) AS display_name, "+
         "max(comment_count) AS comment_count, "+
@@ -43,7 +43,7 @@ WpService.prototype.getIncIndexPosts = function(last_update_time, callback) {
 WpService.prototype.getAllIndexPosts = function(callback) {
     var sql = "SELECT po.ID AS post_id, "+
         "max(post_title) as post_title, "+
-        "max(post_content) as post_content, "+
+        "CONCAT_WS(',', max(post_title), max(post_content)) AS post_content, "+
         "DATE_FORMAT(max(post_date),'%Y-%m-%d %T') as post_time, "+
         "max(usr.display_name) AS display_name, "+
         "max(comment_count) AS comment_count, "+
@@ -83,6 +83,7 @@ WpService.prototype.getPostsDetail = function (postIdList, callback) {
         "LEFT OUTER JOIN wp_terms t ON tax.term_id = t.term_id "+
         "WHERE post_status = 'publish' "+
         "AND post_type = 'post' "+
+        "AND po.ID in ("+ postIdList.join(" ")+ ") "+
         "GROUP BY post_id ";
     this.client.raw(sql).then(function(rows) {
             callback(null, rows[0]);

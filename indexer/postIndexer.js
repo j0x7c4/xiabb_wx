@@ -9,7 +9,11 @@ function PostIndexer () {
     this.mappings = require('./mappings/post');
     this.client = new elasticsearch.Client({
         host: config.host+":"+config.port,
-        log: 'trace'
+        log: {
+            type: 'file',
+            level: 'trace',
+            path: config.log
+        }
     });
 };
 

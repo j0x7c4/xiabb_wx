@@ -89,5 +89,5 @@ function onListening() {
         : 'port ' + addr.port;
     debug('Listening on ' + bind);
     logger.info("Listening on "+ bind);
-    logger.info(config);
+    logger.info(JSON.stringify(config));
 }

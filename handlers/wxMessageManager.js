@@ -3,6 +3,7 @@ var logger = require('../logger/logger').logger(__filename);
 var basicApi = require('./wxApiHandler');
 var wpService = require('./wpService');
 var esSearcher = require('./esSearcher');
+var indexName = "blog_xiabb_post";
 
 var makeWxNews = function (context, callback) {
     basicApi.batchGetMaterial({type:"news", offset:0, count:3}, function(err, resData) {
@@ -69,39 +70,86 @@ var makeText = function (context, callback) {
 };
 
 var makeNews = function(context, callback) {
-    wpService.getPostsDetail([], function(err, rows) {
+    esSearcher.search({
+        index:indexName,
+        query: {
+            match : {
+                post_content : context.content,
+            }
+        }}, function(err, res) {
+        var postIds = [];
         if (err) {
-            callback(err);
+            logger.error(err);
         } else {
-            try {
-                var toUser = context.fromusername;
-                var fromUser = context.tousername;
-                var posts = [];
-                for (var i=0 ; i<rows.length; i++) {
-                    var post = rows[i];
-                    posts.push({
-                        Title: post['post_title'],
-                        Description: post['display_name'],
-                        Url: post['url']
-                    });
-                }
-                var response = {
-                    ToUserName: toUser,
-                    FromUserName: fromUser,
-                    CreateTime: parseInt((new Date().getTime()) / 1000, 10),
-                    MsgType: 'news',
-                    ArticleCount: posts.length,
-                    Articles: {
-                        item: posts
-                    }
-                };
-                callback(null, response);
-            } catch (err) {
-                callback(err);
+            for (var i = 0 ; i<res.hits.hits.length; i++) {
+                var record = res.hits.hits[i];
+                postIds.push(record['_id']);
             }
         }
-    });
 
+        var toUser = context.fromusername;
+        var fromUser = context.tousername;
+
+        if (postIds.length > 0) {
+            wpService.getPostsDetail(postIds, function(err, rows) {
+                if (err) {
+                    callback(err);
+                } else {
+                    try {
+                        var posts = [{
+                            Title:'"'+context.content+'"的搜索结果',
+                            Description: '共搜索到'+rows.length+'篇文章'
+                        }];
+                        for (var i=0 ; i<rows.length; i++) {
+                            var post = rows[i];
+                            posts.push({
+                                Title: post['post_title'],
+                                Description: post['display_name'],
+                                Url: post['url']
+                            });
+                        }
+                        var response = {
+                            ToUserName: toUser,
+                            FromUserName: fromUser,
+                            CreateTime: parseInt((new Date().getTime()) / 1000, 10),
+                            MsgType: 'news',
+                            ArticleCount: posts.length+1,
+                            Articles: {
+                                item: posts
+                            }
+                        };
+                        callback(null, response);
+                    } catch (err) {
+                        callback(err);
+                    }
+                }
+            });
+        } else {
+            var posts = [{
+                Title:'"'+context.content+'"的搜索结果',
+                Description: '啊,没有搜索到文章!'
+            }];
+            //for (var i=0 ; i<rows.length; i++) {
+            //    var post = rows[i];
+            //    posts.push({
+            //        Title: post['post_title'],
+            //        Description: post['display_name'],
+            //        Url: post['url']
+            //    });
+            //}
+            var response = {
+                ToUserName: toUser,
+                FromUserName: fromUser,
+                CreateTime: parseInt((new Date().getTime()) / 1000, 10),
+                MsgType: 'news',
+                ArticleCount: posts.length+1,
+                Articles: {
+                    item: posts
+                }
+            };
+            callback(null, response);
+        }
+    });
 }
 
 module.exports = {
