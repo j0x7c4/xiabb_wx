@@ -97,10 +97,10 @@ var makeNews = function(context, callback) {
             MsgType: 'news',
             ArticleCount: 1,
             Articles: {
-                item: {
+                item: [{
                     Title:'"'+context.content+'"的搜索结果',
                     Description: '哎呀,瞎BB队长开小差去了!'
-                }
+                }]
             }
         };
 
