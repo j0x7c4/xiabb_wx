@@ -142,7 +142,7 @@ var makeNews = function(context, callback) {
                 FromUserName: fromUser,
                 CreateTime: parseInt((new Date().getTime()) / 1000, 10),
                 MsgType: 'news',
-                ArticleCount: posts.length+1,
+                ArticleCount: posts.length,
                 Articles: {
                     item: posts
                 }

@@ -18,7 +18,7 @@ add following config to config/default.json
   "es": {
     "host": "",
     "port": ,
-    "index": "blog_xiabb_post",
+    "index": "",
     "type": "post",
     "bulkSize": 1000,
     "log": "logs/es.log"
