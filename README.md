@@ -10,10 +10,18 @@ add following config to config/default.json
   "wxApiPort": 443,
   "mysql": {
     "host": "",
-    "port": ,
+    "port": 3306,
     "database": "",
     "user": "",
     "password" : ""
+  },
+  "es": {
+    "host": "",
+    "port": ,
+    "index": "blog_xiabb_post",
+    "type": "post",
+    "bulkSize": 1000,
+    "log": "logs/es.log"
   },
   "menu" : {
     "button":
