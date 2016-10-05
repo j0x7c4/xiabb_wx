@@ -41,6 +41,10 @@ add following config to config/default.json
     "bulkSize": 1000,
     "log": "logs/es.log"
   },
+  "exe": {
+    "htmlparser": "bin/htmlparser.py",
+    "firstimg": "bin/firstimg.py"
+  },
   "menu" : {
     "button":
     [
