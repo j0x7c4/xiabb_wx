@@ -118,12 +118,11 @@ var makeNews = function(context, callback) {
                         }];
                         for (var i=0 ; i<rows.length; i++) {
                             var post = rows[i];
-                            var picUrl = wpService.parsePicUrl(post['post_content']);
                             posts.push({
                                 Title: post['post_title'],
                                 Description: post['display_name'],
                                 Url: post['url'],
-                                PicUrl: picUrl
+                                PicUrl: post['pic_url']
                             });
                         }
                         var response = {
