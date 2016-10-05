@@ -1,5 +1,7 @@
 var logger = require('../logger/logger').logger(__filename);
 var wxTextHandler = require('./wxTextHandler');
+var wxLocationHandler = require('./wxLocationHandler');
+
 
 WxEngineHandler = function(data, callback) {
     if (!data || !data.xml) {
@@ -19,6 +21,15 @@ WxEngineHandler = function(data, callback) {
         if (eventType == "Location") {
 
         }
+    } else if (data.xml.msgtype == "location") {
+        var xml = data.xml;
+        wxLocationHandler(xml, function(err, res) {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, res);
+            }
+        });
     }
 };
 
