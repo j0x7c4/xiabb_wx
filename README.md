@@ -9,6 +9,8 @@ A backend service for wechat, including searching, recommendation and multi-stuf
 + elasticsearch
 + mysql
 + nginx
++ pyhton (2.7+)
++ beautifulSoup4
 
 # setup
 + npm run deploy

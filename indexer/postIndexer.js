@@ -1,6 +1,7 @@
 var wpService = require('../handlers/wpService');
 var elasticsearch = require('elasticsearch');
 var config = require('config').es;
+var execHandler = require('../handlers/execHandler');
 
 function PostIndexer () {
     this.BULK_SIZE = config.bulkSize;
@@ -47,6 +48,7 @@ PostIndexer.prototype.createAllIndex = function(callback) {
                                 var actions = [];
                                 for (var i=0 ; i<posts.length; i++) {
                                     var post = posts[i];
+                                    post.post_content = execHandler.parseHtml(post.post_content);
                                     actions.push({index: {_index: indexName, _type: config.type, _id: post.post_id}});
                                     actions.push(post);
                                 }

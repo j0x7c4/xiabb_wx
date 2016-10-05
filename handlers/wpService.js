@@ -1,4 +1,5 @@
 var mysqlConfig = require('config').mysql;
+var execHandler = require('./execHandler');
 
 var knex = require('knex')({
     client: 'mysql',
@@ -67,7 +68,7 @@ WpService.prototype.getAllIndexPosts = function(callback) {
 };
 
 WpService.prototype.parsePicUrl = function(body) {
-    return "http://xiabb.img-cn-shanghai.aliyuncs.com/blog/2016/10/ft_example.jpg";
+    return execHandler.getFirstImg(body);
 };
 
 WpService.prototype.getPostsDetail = function (postIdList, callback) {

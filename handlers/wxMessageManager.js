@@ -3,6 +3,7 @@ var logger = require('../logger/logger').logger(__filename);
 var basicApi = require('./wxApiHandler');
 var wpService = require('./wpService');
 var esSearcher = require('./esSearcher');
+
 var indexName = "blog_xiabb_post";
 
 var makeWxNews = function (context, callback) {
