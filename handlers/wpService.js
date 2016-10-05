@@ -66,10 +66,14 @@ WpService.prototype.getAllIndexPosts = function(callback) {
         });
 };
 
+WpService.prototype.parsePicUrl = function(body) {
+    return "http://xiabb.img-cn-shanghai.aliyuncs.com/blog/2016/10/ft_example.jpg";
+};
+
 WpService.prototype.getPostsDetail = function (postIdList, callback) {
     var sql = "SELECT po.ID AS post_id, "+
         "max(post_title) as post_title, "+
-            //"max(post_content) as post_content, "+
+        "max(post_content) as post_content, "+
         "DATE_FORMAT(max(post_date),'%Y-%m-%d %T') as post_time, "+
         "max(usr.display_name) AS display_name, "+
             //"max(comment_count) AS comment_count, "+
