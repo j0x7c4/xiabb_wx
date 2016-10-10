@@ -143,7 +143,7 @@ var makeNews = function(context, callback) {
             });
         } else {
             esSearcher.search({
-                index:indexName,
+                index:'ks_project',
                 query: {
                     match : {
                         content : context.content,
@@ -213,6 +213,7 @@ var makeNews = function(context, callback) {
                    }
          });
      }
+  });
 }
 
 module.exports = {
