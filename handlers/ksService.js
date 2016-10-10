@@ -45,9 +45,9 @@ KsService.prototype.getPostsDetail = function (postIdList, callback) {
         "backers_count, "+
         "location, "+
         "pledged, "+
-        "DATE_FORMAT(update_time,'%Y-%m-%d %T') AS update_time "+
+        "DATE_FORMAT(update_time,'%Y-%m-%d %T') AS update_time, "+
         "url, "+
-        "remote_url, "+
+        "remote_url "+
         "FROM ks_project "+
         "WHERE id IN ("+ postIdList.join(",") + ")";
     this.client.raw(sql).then(function(rows) {

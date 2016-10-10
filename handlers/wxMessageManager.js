@@ -6,6 +6,8 @@ var esSearcher = require('./esSearcher');
 var ksService = require('./ksService');
 var indexName = "blog_xiabb_post";
 
+MAX_NEWS = 10
+
 var makeWxNews = function (context, callback) {
     basicApi.batchGetMaterial({type:"news", offset:0, count:3}, function(err, resData) {
         if (err) {
@@ -116,7 +118,7 @@ var makeNews = function(context, callback) {
                             Title:'"'+context.content+'"的搜索结果',
                             Description: '共搜索到'+rows.length+'篇文章'
                         }];
-                        for (var i=0 ; i<rows.length; i++) {
+                        for (var i=0 ; i<rows.length && posts.length<MAX_NEWS; i++) {
                             var post = rows[i];
                             posts.push({
                                 Title: post['post_title'],
@@ -169,7 +171,7 @@ var makeNews = function(context, callback) {
 				        Title: '"' + context.content + '"的搜素结过',
                                         Description: '推荐相关的'+rows.length+'篇文章'
                                     }];
-                                    for (var i=0 ; i<rows.length; i++) {
+                                    for (var i=0 ; i<rows.length && posts.length<MAX_NEWS; i++) {
                                         var post = rows[i];
                                         posts.push({
                                             Title: post['name'],
