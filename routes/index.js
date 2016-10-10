@@ -5,6 +5,7 @@ var wxEngineHandler = require('../handlers/wxEngineHandler.js');
 var xmlparser = require('express-xml-bodyparser');
 var o2x = require('object-to-xml');
 var postIndexer = require('../indexer/postIndexer');
+var ksIndexer = require('../indexer/ksIndexer');
 
 router.get('/', function(req, res, next){
     wxStartHandler(req.query, function(err, response) {
@@ -34,6 +35,16 @@ router.get('/health', function(req, res){
 
 router.get('/indexer/post', function(req, res, next) {
     postIndexer.createAllIndex(function(err, data) {
+        if (err) {
+            next(err);
+        } else {
+            res.send(data);
+        }
+    });
+});
+
+router.get('/indexer/ksproject', function(req, res, next) {
+    ksIndexer.createAllIndex(function(err, data) {
         if (err) {
             next(err);
         } else {
