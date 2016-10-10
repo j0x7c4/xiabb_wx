@@ -168,7 +168,7 @@ var makeNews = function(context, callback) {
                             } else {
                                 try {
                                     var posts = [{
-				        Title: '"' + context.content + '"的搜素结过',
+				        Title: '"' + context.content + '"的搜索结果',
                                         Description: '推荐相关的'+rows.length+'篇文章'
                                     }];
                                     for (var i=0 ; i<rows.length && posts.length<MAX_NEWS; i++) {
