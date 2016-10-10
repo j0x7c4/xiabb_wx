@@ -192,6 +192,7 @@ var makeNews = function(context, callback) {
                                     callback(null, errResponse);
                                 }
                             }
+                      });
                     } else {
 
                         var posts = [{
