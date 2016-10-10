@@ -62,7 +62,7 @@ WpService.prototype.getPostsDetail = function (postIdList, callback) {
         "LEFT OUTER JOIN wp_terms t ON tax.term_id = t.term_id "+
         "WHERE post_status = 'publish' "+
         "AND post_type = 'post' "+
-        "AND po.ID in ("+ postIdList.join(" ")+ ") "+
+        "AND po.ID in ("+ postIdList.join(",")+ ") "+
         "GROUP BY post_id ";
     this.client.raw(sql).then(function(rows) {
             var posts = rows[0];
