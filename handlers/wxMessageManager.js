@@ -3,7 +3,7 @@ var logger = require('../logger/logger').logger(__filename);
 var basicApi = require('./wxApiHandler');
 var wpService = require('./wpService');
 var esSearcher = require('./esSearcher');
-
+var ksService = require('./ksService');
 var indexName = "blog_xiabb_post";
 
 var makeWxNews = function (context, callback) {
@@ -142,23 +142,76 @@ var makeNews = function(context, callback) {
                 }
             });
         } else {
-            var posts = [{
-                Title:'"'+context.content+'"的搜索结果',
-                Description: '啊,没有搜索到文章!'
-            }];
-            var response = {
-                ToUserName: toUser,
-                FromUserName: fromUser,
-                CreateTime: parseInt((new Date().getTime()) / 1000, 10),
-                MsgType: 'news',
-                ArticleCount: posts.length,
-                Articles: {
-                    item: posts
-                }
-            };
-            callback(null, response);
-        }
-    });
+            esSearcher.search({
+                index:indexName,
+                query: {
+                    match : {
+                        content : context.content,
+                    }
+                }}, function(err, res) {
+                    var postIds = [];
+                    if (err) {
+                        logger.error(err);
+                    } else {
+                        for (var i = 0 ; i<res.hits.hits.length; i++) {
+                            var record = res.hits.hits[i];
+                            postIds.push(record['_id']);
+                        }
+                    }
+                    if (postIds.length>0) {
+                        ksService.getPostsDetail(postIds, function(err, rows) {
+                            if (err) {
+                                logger.error(err);
+                                callback(null, errResponse);
+                            } else {
+                                try {
+                                    var posts = [{
+				        Title: '"' + context.content + '"的搜素结过',
+                                        Description: '推荐相关的'+rows.length+'篇文章'
+                                    }];
+                                    for (var i=0 ; i<rows.length; i++) {
+                                        var post = rows[i];
+                                        posts.push({
+                                            Title: post['name'],
+                                            Description: post['location'],
+                                            Url: post['url']
+                                        });
+                                    }
+                                    var response = {
+                                        ToUserName: toUser,
+                                        FromUserName: fromUser,
+                                        CreateTime: parseInt((new Date().getTime()) / 1000, 10),
+                                        MsgType: 'news',
+                                        ArticleCount: posts.length,
+                                        Articles: {
+                                            item: posts
+                                        }
+                                    };
+                                    callback(null , response);
+                                } catch (err) {
+                                    callback(null, errResponse);
+                                }
+                            }
+                    } else {
+
+                        var posts = [{
+                            Title:'"'+context.content+'"的搜索结果',
+                            Description: '啊,没有搜索到文章!'
+                        }];
+                        var response = {
+                                ToUserName: toUser,
+                                FromUserName: fromUser,
+                                CreateTime: parseInt((new Date().getTime()) / 1000, 10),
+                                MsgType: 'news',
+                                ArticleCount: posts.length,
+                                Articles: {
+                                    item: posts
+                                }
+                        };
+                        callback(null, response);
+                   }
+         });
+     }
 }
 
 module.exports = {
