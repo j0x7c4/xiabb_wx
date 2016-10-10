@@ -5,7 +5,7 @@ var wxEngineHandler = require('../handlers/wxEngineHandler.js');
 var xmlparser = require('express-xml-bodyparser');
 var o2x = require('object-to-xml');
 var postIndexer = require('../indexer/postIndexer');
-var ksIndexer = require('../indexer/ksIndexer');
+var ksIndexer = require('../indexer/ksProjectIndexer');
 
 router.get('/', function(req, res, next){
     wxStartHandler(req.query, function(err, response) {
