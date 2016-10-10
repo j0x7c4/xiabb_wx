@@ -1,5 +1,6 @@
 module.exports = {
     properties: {
+        id: {type: 'integer'},
         name: {type: 'string', analyzer:'ik_max_word', search_analyzer: 'ik_max_word'},
         creator: {type: 'string', analyzer:'ik_max_word', search_analyzer: 'ik_max_word'},
         content: {type: 'string', analyzer:'ik_max_word', search_analyzer: 'ik_max_word'},
