@@ -12,7 +12,7 @@ var Sequence = exports.Sequence || require('sequence').Sequence
     , err
     ;
 
-MAX_NEWS = 10
+MAX_NEWS = 10;
 
 var makeWxNews = function (context, callback) {
     basicApi.batchGetMaterial({type:"news", offset:0, count:3}, function(err, resData) {
