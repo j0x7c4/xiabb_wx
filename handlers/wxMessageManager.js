@@ -161,12 +161,14 @@ var makeNews = function(context, callback) {
         .then(function (next, err, searchResult) {
             doSearch(indexNameList[0], "post_content", context, function (err, postIds) {
                 searchResult[indexTypeList[0]] = postIds;
+                logger.info(JSON.stringify(searchResult));
                 next(err, searchResult);
             });
         })
         .then(function (next, err, searchResult) {
             doSearch(indexNameList[1], "content", context, function (err, postIds) {
                 searchResult[indexTypeList[1]] = postIds;
+                logger.info(JSON.stringify(searchResult));
                 next(err, searchResult);
             });
         })
@@ -184,7 +186,7 @@ var makeNews = function(context, callback) {
                     }
                 });
             } else if (searchResult && searchResult[indexTypeList[1]] && searchResult[indexTypeList[1]].length > 0) {
-                var postIds = searchResult[indexTypeList[0]];
+                var postIds = searchResult[indexTypeList[1]];
                 ksService.getPostsDetail(postIds, function (err, rows) {
                     if (err) {
                         logger.error(err);
