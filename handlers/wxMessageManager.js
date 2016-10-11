@@ -106,6 +106,7 @@ var makeResponse = function (context, rows) {
 }
 
 var doSearch = function (indexName, searchField, context, callback) {
+    var searchField = searchField;
     esSearcher.search({
         index:indexName,
         query: {
