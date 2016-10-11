@@ -38,7 +38,9 @@ KsService.prototype.getAllIndexPosts = function(callback) {
 KsService.prototype.getPostsDetail = function (postIdList, callback) {
     var sql = "SELECT id, "+
         "name, "+
+        "name AS title, "+
         "creator, "+
+        "location AS description, "+
         "content, "+
         "DATE_FORMAT(add_time,'%Y-%m-%d %T') as add_time, "+
         "category_tag, "+

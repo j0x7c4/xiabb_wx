@@ -17,6 +17,9 @@ function KsIndexer () {
     });
 };
 
+var baseIndexName = "ks_project";
+var indexType = "ks_project";
+
 KsIndexer.prototype.createIncIndex = function(callback) {
 
 };
@@ -29,16 +32,16 @@ KsIndexer.prototype.createAllIndex = function(callback) {
         } else {
             try {
                 var updateTime = new Date();
-                var indexName = "ks_project" + "_" + parseInt(updateTime.getTime()/1000,10);
+                var indexName = baseIndexName + "_" + parseInt(updateTime.getTime()/1000,10);
                 that.client.indices.create({index: indexName}, function (err, data, status) {
                     if (err) {
                         callback(err);
                     } else {
                         that.client.indices.putMapping({
                             index: indexName,
-                            type: 'ks_project',
+                            type: indexType,
                             body: {
-                                'ks_project': that.mappings
+                                indexType: that.mappings
                             }
                         }, function(err, data, status) {
                             if (err) {
@@ -47,7 +50,7 @@ KsIndexer.prototype.createAllIndex = function(callback) {
                                 var actions = [];
                                 for (var i=0 ; i<posts.length; i++) {
                                     var post = posts[i];
-                                    actions.push({index: {_index: indexName, _type: 'ks_project', _id: post.id}});
+                                    actions.push({index: {_index: indexName, _type: indexType, _id: post.id}});
                                     actions.push(post);
                                 }
                                 that.client.bulk({
@@ -57,12 +60,12 @@ KsIndexer.prototype.createAllIndex = function(callback) {
                                         callback(err);
                                     } else {
                                         that.client.indices.deleteAlias({
-                                            index: "ks_project_*",
-                                            name: "ks_project"
+                                            index: baseIndexName + "_*",
+                                            name: baseIndexName
                                         }, function(err, data, status) {
                                             that.client.indices.putAlias({
                                                 index:indexName,
-                                                name: "ks_project"
+                                                name: baseIndexName
                                             }, function(err, data, status) {
                                                 if (err) {
                                                     callback(err);

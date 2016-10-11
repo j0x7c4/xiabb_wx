@@ -17,6 +17,10 @@ function PostIndexer () {
     });
 };
 
+var baseIndexName = "blog_xiabb_post";
+var indexType = "post";
+
+
 PostIndexer.prototype.createIncIndex = function(callback) {
 
 };
@@ -29,16 +33,16 @@ PostIndexer.prototype.createAllIndex = function(callback) {
         } else {
             try {
                 var updateTime = new Date();
-                var indexName = config.index + "_" + parseInt(updateTime.getTime()/1000,10);
+                var indexName = baseIndexName + "_" + parseInt(updateTime.getTime()/1000,10);
                 that.client.indices.create({index: indexName}, function (err, data, status) {
                     if (err) {
                         callback(err);
                     } else {
                         that.client.indices.putMapping({
                             index: indexName,
-                            type: config.type,
+                            type: indexType,
                             body: {
-                                'post': that.mappings
+                                indexType: that.mappings
                             }
                         }, function(err, data, status) {
                             if (err) {
@@ -47,7 +51,7 @@ PostIndexer.prototype.createAllIndex = function(callback) {
                                 var actions = [];
                                 for (var i=0 ; i<posts.length; i++) {
                                     var post = posts[i];
-                                    actions.push({index: {_index: indexName, _type: config.type, _id: post.post_id}});
+                                    actions.push({index: {_index: indexName, _type: indexType, _id: post.post_id}});
                                     actions.push(post);
                                 }
                                 that.client.bulk({
@@ -57,12 +61,12 @@ PostIndexer.prototype.createAllIndex = function(callback) {
                                         callback(err);
                                     } else {
                                         that.client.indices.deleteAlias({
-                                            index: config.index+"_*",
-                                            name: config.index
+                                            index: baseIndexName +"_*",
+                                            name: baseIndexName
                                         }, function(err, data, status) {
                                             that.client.indices.putAlias({
                                                 index:indexName,
-                                                name: config.index
+                                                name: baseIndexName
                                             }, function(err, data, status) {
                                                 if (err) {
                                                     callback(err);

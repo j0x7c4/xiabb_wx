@@ -48,9 +48,11 @@ WpService.prototype.getAllIndexPosts = function(callback) {
 WpService.prototype.getPostsDetail = function (postIdList, callback) {
     var sql = "SELECT po.ID AS post_id, "+
         "max(post_title) as post_title, "+
+        "max(post_title) as title, "+
         "max(post_content) as post_content, "+
         "DATE_FORMAT(max(post_date),'%Y-%m-%d %T') as post_time, "+
         "max(usr.display_name) AS display_name, "+
+        "max(usr.display_name) AS description, "+
             //"max(comment_count) AS comment_count, "+
         "max(guid) AS url, " +
         "group_concat(t.name) AS term_name, "+

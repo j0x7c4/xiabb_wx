@@ -1,10 +1,16 @@
 var logger = require('../logger/logger').logger(__filename);
-
+var config = require('config');
 var basicApi = require('./wxApiHandler');
 var wpService = require('./wpService');
 var esSearcher = require('./esSearcher');
 var ksService = require('./ksService');
-var indexName = "blog_xiabb_post";
+var indexNameList = config.es.index;
+var indexTypeList = config.es.type;
+
+var Sequence = exports.Sequence || require('sequence').Sequence
+    , sequence = Sequence.create()
+    , err
+    ;
 
 MAX_NEWS = 10
 
@@ -72,150 +78,125 @@ var makeText = function (context, callback) {
     }
 };
 
-var makeNews = function(context, callback) {
+var makeResponse = function (context, rows) {
+    var posts = [{
+        Title:'"'+context.content+'"的搜索结果',
+        Description: '共搜索到'+rows.length+'篇文章'
+    }];
+    for (var i=0 ; i<rows.length && posts.length<MAX_NEWS; i++) {
+        var post = rows[i];
+        posts.push({
+            Title: post['title'],
+            Description: post['description'],
+            Url: post['url'],
+            PicUrl: post['pic_url']
+        });
+    }
+    var response = {
+        ToUserName: context.fromusername,
+        FromUserName: context.tousername,
+        CreateTime: parseInt((new Date().getTime()) / 1000, 10),
+        MsgType: 'news',
+        ArticleCount: posts.length,
+        Articles: {
+            item: posts
+        }
+    };
+    return response;
+}
+
+var doSearch = function (indexName, searchField, context, callback) {
     esSearcher.search({
         index:indexName,
         query: {
             match : {
-                post_content : context.content,
+                searchField : context.content,
             }
         }}, function(err, res) {
         var postIds = [];
         if (err) {
             logger.error(err);
+            callback(err);
         } else {
-            for (var i = 0 ; i<res.hits.hits.length; i++) {
+            for (var i = 0; i < res.hits.hits.length && postIds.length<MAX_NEWS; i++) {
                 var record = res.hits.hits[i];
                 postIds.push(record['_id']);
             }
+            callback(null, postIds);
         }
-
-        var toUser = context.fromusername;
-        var fromUser = context.tousername;
-
-        var errResponse = {
-            ToUserName: toUser,
-            FromUserName: fromUser,
-            CreateTime: parseInt((new Date().getTime()) / 1000, 10),
-            MsgType: 'news',
-            ArticleCount: 1,
-            Articles: {
-                item: [{
-                    Title:'"'+context.content+'"的搜索结果',
-                    Description: '哎呀,瞎BB队长开小差去了!'
-                }]
-            }
-        };
-
-        if (postIds.length > 0) {
-            wpService.getPostsDetail(postIds, function(err, rows) {
-                if (err) {
-                    logger.error(err);
-                    callback(null, errResponse);
-                } else {
-                    try {
-                        var posts = [{
-                            Title:'"'+context.content+'"的搜索结果',
-                            Description: '共搜索到'+rows.length+'篇文章'
-                        }];
-                        for (var i=0 ; i<rows.length && posts.length<MAX_NEWS; i++) {
-                            var post = rows[i];
-                            posts.push({
-                                Title: post['post_title'],
-                                Description: post['display_name'],
-                                Url: post['url'],
-                                PicUrl: post['pic_url']
-                            });
-                        }
-                        var response = {
-                            ToUserName: toUser,
-                            FromUserName: fromUser,
-                            CreateTime: parseInt((new Date().getTime()) / 1000, 10),
-                            MsgType: 'news',
-                            ArticleCount: posts.length,
-                            Articles: {
-                                item: posts
-                            }
-                        };
-                        callback(null, response);
-                    } catch (err) {
-                        callback(null, errResponse);
-                    }
-                }
+    });
+}
+var makeNews = function(context, callback) {
+    var errResponse = {
+        ToUserName: context.fromusername,
+        FromUserName: context.tousername,
+        CreateTime: parseInt((new Date().getTime()) / 1000, 10),
+        MsgType: 'news',
+        ArticleCount: 1,
+        Articles: {
+            item: [{
+                Title: '"' + context.content + '"的搜索结果',
+                Description: '哎呀,瞎BB队长开小差去了!'
+            }]
+        }
+    };
+    var emptyResponse = {
+        ToUserName: context.fromusername,
+        FromUserName: context.tousername,
+        CreateTime: parseInt((new Date().getTime()) / 1000, 10),
+        MsgType: 'news',
+        ArticleCount: 1,
+        Articles: {
+            item: [{
+                Title: '"' + context.content + '"的搜索结果',
+                Description: '啊,没有搜索到文章!'
+            }]
+        }
+    };
+    sequence
+        .then(function (next) {
+            searchResult = {}
+            next(null, searchResult);
+        })
+        .then(function (next, err, searchResult) {
+            doSearch(indexNameList[0], "post_content", context, function (err, postIds) {
+                searchResult[indexTypeList[0]] = postIds;
+                next(err, searchResult);
             });
-        } else {
-            esSearcher.search({
-                index:'ks_project',
-                query: {
-                    match : {
-                        content : context.content,
-                    }
-                }}, function(err, res) {
-                    var postIds = [];
+        })
+        .then(function (next, err, searchResult) {
+            doSearch(indexNameList[1], "content", context, function (err, postIds) {
+                searchResult[indexTypeList[1]] = postIds;
+                next(err, searchResult);
+            });
+        })
+        .then(function (next, err, searchResult) {
+            if (err) {
+                callback(null, errResponse);
+            } else if (searchResult && searchResult[indexTypeList[0]] && searchResult[indexTypeList[0]].length > 0) {
+                var postIds = searchResult[indexTypeList[0]];
+                wpService.getPostsDetail(postIds, function (err, rows) {
                     if (err) {
                         logger.error(err);
+                        callback(null, errResponse);
                     } else {
-                        for (var i = 0 ; i<res.hits.hits.length; i++) {
-                            var record = res.hits.hits[i];
-                            postIds.push(record['_id']);
-                        }
+                        callback(null, makeResponse(context, rows));
                     }
-                    if (postIds.length>0) {
-                        ksService.getPostsDetail(postIds, function(err, rows) {
-                            if (err) {
-                                logger.error(err);
-                                callback(null, errResponse);
-                            } else {
-                                try {
-                                    var posts = [{
-				        Title: '"' + context.content + '"的搜索结果',
-                                        Description: '推荐相关的'+rows.length+'篇文章'
-                                    }];
-                                    for (var i=0 ; i<rows.length && posts.length<MAX_NEWS; i++) {
-                                        var post = rows[i];
-                                        posts.push({
-                                            Title: post['name'],
-                                            Description: post['location'],
-                                            Url: post['url']
-                                        });
-                                    }
-                                    var response = {
-                                        ToUserName: toUser,
-                                        FromUserName: fromUser,
-                                        CreateTime: parseInt((new Date().getTime()) / 1000, 10),
-                                        MsgType: 'news',
-                                        ArticleCount: posts.length,
-                                        Articles: {
-                                            item: posts
-                                        }
-                                    };
-                                    callback(null , response);
-                                } catch (err) {
-                                    callback(null, errResponse);
-                                }
-                            }
-                      });
+                });
+            } else if (searchResult && searchResult[indexTypeList[1]] && searchResult[indexTypeList[1]].length > 0) {
+                var postIds = searchResult[indexTypeList[0]];
+                ksService.getPostsDetail(postIds, function (err, rows) {
+                    if (err) {
+                        logger.error(err);
+                        callback(null, errResponse);
                     } else {
-
-                        var posts = [{
-                            Title:'"'+context.content+'"的搜索结果',
-                            Description: '啊,没有搜索到文章!'
-                        }];
-                        var response = {
-                                ToUserName: toUser,
-                                FromUserName: fromUser,
-                                CreateTime: parseInt((new Date().getTime()) / 1000, 10),
-                                MsgType: 'news',
-                                ArticleCount: posts.length,
-                                Articles: {
-                                    item: posts
-                                }
-                        };
-                        callback(null, response);
-                   }
-         });
-     }
-  });
+                        callback(null, makeResponse(context, rows));
+                    }
+                });
+            } else {
+                callback(null, emptyResponse);
+            }
+        });
 }
 
 module.exports = {
