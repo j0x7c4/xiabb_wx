@@ -106,14 +106,12 @@ var makeResponse = function (context, rows) {
 }
 
 var doSearch = function (indexName, searchField, context, callback) {
-    var searchField = searchField;
+    var query = {};
+    query['match'] = {};
+    query['match'][searchField] = context.content;
     esSearcher.search({
         index:indexName,
-        query: {
-            match : {
-                searchField : context.content,
-            }
-        }}, function(err, res) {
+        query: query, function(err, res) {
         var postIds = [];
         if (err) {
             logger.error(err);
