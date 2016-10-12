@@ -38,12 +38,12 @@ PostIndexer.prototype.createAllIndex = function(callback) {
                     if (err) {
                         callback(err);
                     } else {
+                        var body = {}
+                        body[indexType] = that.mappings;
                         that.client.indices.putMapping({
                             index: indexName,
                             type: indexType,
-                            body: {
-                                indexType: that.mappings
-                            }
+                            body: body
                         }, function(err, data, status) {
                             if (err) {
                                 callback(err);
