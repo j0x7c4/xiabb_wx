@@ -6,6 +6,7 @@ var xmlparser = require('express-xml-bodyparser');
 var o2x = require('object-to-xml');
 var postIndexer = require('../indexer/postIndexer');
 var ksIndexer = require('../indexer/ksProjectIndexer');
+var PdIndexer = require('../indexer/productIndexer');
 
 router.get('/', function(req, res, next){
     wxStartHandler(req.query, function(err, response) {
@@ -45,6 +46,16 @@ router.get('/indexer/post', function(req, res, next) {
 
 router.get('/indexer/ksproject', function(req, res, next) {
     ksIndexer.createAllIndex(function(err, data) {
+        if (err) {
+            next(err);
+        } else {
+            res.send(data);
+        }
+    });
+});
+
+router.get('/indexer/product', function(req, res, next) {
+    PdIndexer.createAllIndex(function(err, data) {
         if (err) {
             next(err);
         } else {

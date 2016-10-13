@@ -4,6 +4,7 @@ var basicApi = require('./wxApiHandler');
 var wpService = require('./wpService');
 var esSearcher = require('./esSearcher');
 var ksService = require('./ksService');
+var pdService = require('./pdService');
 var indexNameList = config.es.index;
 var indexTypeList = config.es.type;
 
@@ -173,6 +174,13 @@ var makeNews = function(context, callback) {
             });
         })
         .then(function (next, err, searchResult) {
+            doSearch(indexNameList[2], "content", context, function (err, postIds) {
+                searchResult[indexTypeList[2]] = postIds;
+                //logger.info(JSON.stringify(searchResult));
+                next(err, searchResult);
+            });
+        })
+        .then(function (next, err, searchResult) {
             if (err) {
                 callback(null, errResponse);
             } else if (searchResult && searchResult[indexTypeList[0]] && searchResult[indexTypeList[0]].length > 0) {
@@ -188,6 +196,16 @@ var makeNews = function(context, callback) {
             } else if (searchResult && searchResult[indexTypeList[1]] && searchResult[indexTypeList[1]].length > 0) {
                 var postIds = searchResult[indexTypeList[1]];
                 ksService.getPostsDetail(postIds, function (err, rows) {
+                    if (err) {
+                        logger.error(err);
+                        callback(null, errResponse);
+                    } else {
+                        callback(null, makeResponse(context, rows));
+                    }
+                });
+            } else if (searchResult && searchResult[indexTypeList[2]] && searchResult[indexTypeList[2]].length > 0) {
+                var postIds = searchResult[indexTypeList[2]];
+                PdService.getPostsDetail(postIds, function (err, rows) {
                     if (err) {
                         logger.error(err);
                         callback(null, errResponse);
