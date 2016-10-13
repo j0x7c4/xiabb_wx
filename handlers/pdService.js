@@ -44,7 +44,7 @@ PdService.prototype.getPostsDetail = function (postIdList, callback) {
         "category, "+
         "en_name, "+
         "DATE_FORMAT(update_time,'%Y-%m-%d %T') AS update_time, "+
-        "url, "+
+        "a.url AS url, "+
         "remote_url, "+
         "b.url AS pic_url "+
         "FROM xiabb_product a JOIN (SELECT brand, max(url) as url FROM xiabb_product_img WHERE type = 2 GROUP BY brand)b on (a.brand = b.brand)"+
