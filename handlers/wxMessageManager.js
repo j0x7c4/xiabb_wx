@@ -205,7 +205,7 @@ var makeNews = function(context, callback) {
                 });
             } else if (searchResult && searchResult[indexTypeList[2]] && searchResult[indexTypeList[2]].length > 0) {
                 var postIds = searchResult[indexTypeList[2]];
-                PdService.getPostsDetail(postIds, function (err, rows) {
+                pdService.getPostsDetail(postIds, function (err, rows) {
                     if (err) {
                         logger.error(err);
                         callback(null, errResponse);
