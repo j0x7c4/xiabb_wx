@@ -23,9 +23,8 @@ PdService.prototype.getAllIndexPosts = function(callback) {
         "category, "+
         "CONCAT_WS(',', CONCAT_WS(',', CONCAT_WS(',', name, info), brand), en_name) AS content, "+
         "DATE_FORMAT(add_time,'%Y-%m-%d %T') as add_time, "+
-        "price, "+
         "DATE_FORMAT(update_time,'%Y-%m-%d %T') AS update_time "+
-        "FROM xiabb_raw_product";
+        "FROM xiabb_product";
     this.client.raw(sql).then(function(rows) {
             callback(null, rows[0]);
         })
@@ -38,17 +37,17 @@ PdService.prototype.getPostsDetail = function (postIdList, callback) {
     var sql = "SELECT id, "+
         "name, "+
         "name AS title, "+
-        "brand, "+
+        "a.brand, "+
         "info AS description, "+
         "info, "+
         "DATE_FORMAT(add_time,'%Y-%m-%d %T') as add_time, "+
         "category, "+
-        "price, "+
         "en_name, "+
         "DATE_FORMAT(update_time,'%Y-%m-%d %T') AS update_time, "+
         "url, "+
-        "remote_url "+
-        "FROM xiabb_raw_product "+
+        "remote_url, "+
+        "b.url AS pic_url "+
+        "FROM xiabb_product a JOIN (SELECT brand, max(url) as url FROM xiabb_product_img WHERE type = 2 GROUP BY brand)b on (a.brand = b.brand)"+
         "WHERE id IN ("+ postIdList.join(",") + ")";
     this.client.raw(sql).then(function(rows) {
             var posts = rows[0];
